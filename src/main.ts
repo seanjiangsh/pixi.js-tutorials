@@ -9,6 +9,7 @@ import graphicsSvgs from "./scenes/graphics-svg";
 import eventDragging from "./scenes/events-dragging";
 import spriteAnimateJet from "./scenes/sprite-animate-jet";
 import tutorialFishPond from "./scenes/tutorials-fish-pond";
+import tutorialChooChooTrain from "./scenes/tutorials-choo-choo-train";
 
 const scenes: { [key: string]: () => Promise<() => void> } = {
   "hello-world": helloWorld,
@@ -22,6 +23,7 @@ const scenes: { [key: string]: () => Promise<() => void> } = {
   "events-dragging": eventDragging,
   "sprite-animate-jet": spriteAnimateJet,
   "tutorial-fish-pond": tutorialFishPond,
+  "tutorial-choo-choo-train": tutorialChooChooTrain,
 };
 
 let currentSceneCleanup: (() => void) | null = null;
@@ -73,4 +75,4 @@ for (const scene in scenes) {
 }
 
 // Load default scene
-loadScene("tutorial-fish-pond");
+loadScene("tutorial-choo-choo-train");

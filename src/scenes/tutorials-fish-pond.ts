@@ -15,12 +15,12 @@ interface FishSprite extends Sprite {
   turnSpeed: number;
 }
 
-// Create a PixiJS fishpond application.
-const app = new Application();
-
 async function setup() {
+  // Create a PixiJS fishpond application.
+  const app = new Application();
   await app.init({ resizeTo: window, backgroundColor: 0x1099bb });
   document.body.appendChild(app.canvas);
+  return app;
 }
 
 async function preload() {
@@ -61,7 +61,7 @@ async function preload() {
   await Assets.load(assets);
 }
 
-function addBackground() {
+function addBackground(app: Application) {
   const background = Sprite.from("background");
   background.anchor.set(0.5);
 
@@ -175,15 +175,10 @@ function addDisplacementEffect(app: Application) {
   app.stage.filters = [filter];
 }
 
-function onResize() {
-  // Resize the app
-  app.resize();
-}
-
 export default async function initScene() {
-  await setup();
   await preload();
-  addBackground();
+  const app = await setup();
+  addBackground(app);
   addWaterOverlay(app);
   addDisplacementEffect(app);
 
@@ -193,6 +188,10 @@ export default async function initScene() {
     animateFishes(app, fishes);
     animateWaterOverlay(app, ticker);
   });
+
+  const onResize = () => {
+    app.resize();
+  };
 
   window.addEventListener("resize", onResize);
 
