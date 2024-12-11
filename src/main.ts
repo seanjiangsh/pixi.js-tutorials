@@ -10,6 +10,7 @@ import eventDragging from "./scenes/events-dragging";
 import spriteAnimateJet from "./scenes/sprite-animate-jet";
 import tutorialFishPond from "./scenes/tutorials-fish-pond";
 import tutorialChooChooTrain from "./scenes/tutorials-choo-choo-train";
+import spineBoy from "./scenes/spineboy/tutorials-spineboy";
 
 const scenes: { [key: string]: () => Promise<() => void> } = {
   "hello-world": helloWorld,
@@ -24,6 +25,7 @@ const scenes: { [key: string]: () => Promise<() => void> } = {
   "sprite-animate-jet": spriteAnimateJet,
   "tutorial-fish-pond": tutorialFishPond,
   "tutorial-choo-choo-train": tutorialChooChooTrain,
+  "tutorial-spineboy": spineBoy,
 };
 
 let currentSceneCleanup: (() => void) | null = null;
@@ -75,4 +77,4 @@ for (const scene in scenes) {
 }
 
 // Load default scene
-loadScene("tutorial-choo-choo-train");
+loadScene("tutorial-spineboy");
