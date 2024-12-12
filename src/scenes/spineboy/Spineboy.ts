@@ -141,16 +141,17 @@ export default class SpineBoy {
   loop() {
     if (this.isSpawning()) return;
 
-    const { right, left, down, space } = this.inputController.keys;
-    const rightPressed = right.pressed;
+    const { left, right, up, space } = this.inputController.keys;
     const leftPressed = left.pressed;
-    const downPressed = down.pressed;
+    const rightPressed = right.pressed;
+    const upPressed = up.pressed;
     const run = left.doubleTap || right.doubleTap;
 
     const { state } = this;
     state.walk = rightPressed || leftPressed;
-    state.run = state.walk && (state.run || run);
-    state.hover = downPressed;
+    state.run = run;
+    // state.run = state.walk && (state.run || run);
+    state.hover = upPressed;
     state.jump = space.pressed;
 
     if (leftPressed) {

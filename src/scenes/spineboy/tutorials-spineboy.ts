@@ -9,7 +9,7 @@ async function setup() {
   const app = new Application();
 
   // Intialize the application.
-  await app.init({ background: "#1099bb", resizeTo: window });
+  await app.init({ background: "#000", resizeTo: window });
 
   // Then adding the application's canvas to the DOM body.
   document.body.appendChild(app.canvas);
