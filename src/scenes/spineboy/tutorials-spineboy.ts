@@ -41,6 +41,7 @@ async function setup() {
       src: "https://pixijs.com/assets/tutorials/spineboy-adventure/platform.png",
     },
   ]);
+
   return app;
 }
 
@@ -51,10 +52,11 @@ export default async function initScene() {
   const scene = new Scene(app, spineBoy);
 
   // Adjust views' transformation.
-  scene.view.y = app.screen.height;
-  spineBoy.view.x = app.screen.width / 2;
-  spineBoy.view.y = app.screen.height - scene.floorHeight;
-  spineBoy.spine.scale.set(scene.scale * 0.32);
+  const { width, height } = app.screen;
+  const { floorHeight, scale } = scene;
+  spineBoy.view.x = width / 2;
+  spineBoy.view.y = height - floorHeight;
+  spineBoy.spine.scale.set(scale * 0.32);
 
   // Add character and scene to the stage.
   app.stage.addChild(scene.view, spineBoy.view);
@@ -62,8 +64,18 @@ export default async function initScene() {
   // Trigger character's spawn animation.
   spineBoy.spawn();
 
+  const resize = () => {
+    setTimeout(() => {
+      const { floorHeight, scale } = scene.resize();
+      spineBoy.resize(floorHeight, scale);
+    }, 50);
+  };
+
+  window.addEventListener("resize", resize);
+
   return () => {
     inputController.dispose();
+    window.removeEventListener("resize", resize);
     document.body.removeChild(app.canvas);
     app.destroy(true, { children: true });
   };

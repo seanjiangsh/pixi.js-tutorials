@@ -5,15 +5,14 @@ import SpineBoy from "./Spineboy";
 export class Scene {
   app: Application;
   spriteBoy: SpineBoy;
-
   view: Container;
-  sky: Sprite;
-  background: TilingSprite;
-  midground: TilingSprite;
-  platform: TilingSprite;
-
   scale: number;
   floorHeight: number;
+
+  private sky: Sprite;
+  private background: TilingSprite;
+  private midground: TilingSprite;
+  private platform: TilingSprite;
 
   constructor(app: Application, spineBoy: SpineBoy) {
     this.app = app;
@@ -22,19 +21,49 @@ export class Scene {
 
     // Create a main view that holds all layers.
     this.view = new Container();
-    this.sky = this.createSky(width, height);
-    this.scale = this.calculateScale(height);
-    this.floorHeight = this.calculateFloorHeight(height);
 
-    this.background = this.createTilingSprite("background", width);
-    this.midground = this.createTilingSprite("midground", width);
-    this.platform = this.createTilingSprite(
-      "platform",
+    // Create the stationary sky that fills the entire screen.
+    this.sky = Sprite.from("sky");
+    this.sky.width = width;
+    this.sky.height = height;
+
+    // Create textures for the background, mid-ground, and platform.
+    const backgroundTexture = Texture.from("background");
+    const midgroundTexture = Texture.from("midground");
+    const platformTexture = Texture.from("platform");
+
+    // Calculate the ideal platform height depending on the passed-in screen height.
+    const maxPlatformHeight = platformTexture.height;
+    const platformHeight = Math.min(maxPlatformHeight, height * 0.4);
+
+    // Calculate the scale to be apply to all tiling textures for consistency.
+    const scale = (this.scale = this.calculateScale());
+    // Calculate the floor height for external referencing.
+    this.floorHeight = this.calculateFloorHeight();
+
+    const baseOptions = {
       width,
-      this.floorHeight
-    );
+      tileScale: { x: scale, y: scale },
+    };
 
-    this.background.y = this.midground.y = -this.floorHeight;
+    // Create the tiling sprite layers.
+    this.background = new TilingSprite({
+      texture: backgroundTexture,
+      height: backgroundTexture.height * scale,
+      ...baseOptions,
+    });
+    this.midground = new TilingSprite({
+      texture: midgroundTexture,
+      height: midgroundTexture.height * scale,
+      ...baseOptions,
+    });
+    this.platform = new TilingSprite({
+      texture: platformTexture,
+      height: platformHeight,
+      ...baseOptions,
+    });
+
+    // Add all layers to the main view.
     this.view.addChild(
       this.sky,
       this.background,
@@ -42,40 +71,48 @@ export class Scene {
       this.platform
     );
 
+    this.resize();
+
     this.app.ticker.add(this.loop, this);
   }
 
-  private createSky(width: number, height: number): Sprite {
-    const sky = Sprite.from("sky");
-    sky.anchor.set(0, 1);
+  private calculateScale(): number {
+    const { height } = this.app.screen;
+    const platformHeight = Texture.from("platform").height;
+    return Math.min(platformHeight, height * 0.4) / platformHeight;
+  }
+
+  private calculateFloorHeight(): number {
+    const platformHeight = Texture.from("platform").height;
+    return this.calculateScale() * platformHeight * 0.43;
+  }
+
+  resize() {
+    const { app, sky, background, midground, platform } = this;
+    const { width, height } = app.screen;
+
+    const scale = (this.scale = this.calculateScale());
+    const floorHeight = (this.floorHeight = this.calculateFloorHeight());
+
     sky.width = width;
     sky.height = height;
-    return sky;
-  }
 
-  private calculateScale(height: number): number {
-    const maxPlatformHeight = Texture.from("platform").height;
-    return Math.min(maxPlatformHeight, height * 0.4) / maxPlatformHeight;
-  }
+    background.width = width;
+    background.tileScale.set(scale, scale);
+    background.height = background.texture.height * scale;
+    background.y = height - background.height;
 
-  private calculateFloorHeight(height: number): number {
-    return this.calculateScale(height) * Texture.from("platform").height * 0.43;
-  }
+    midground.width = width;
+    midground.tileScale.set(scale, scale);
+    midground.height = midground.texture.height * scale;
+    midground.y = height - midground.height;
 
-  private createTilingSprite(
-    alias: string,
-    width: number,
-    height?: number
-  ): TilingSprite {
-    const texture = Texture.from(alias);
-    return new TilingSprite({
-      texture,
-      width,
-      height: height || texture.height * this.scale,
-      tileScale: { x: this.scale, y: this.scale },
-      anchor: { x: 0, y: 1 },
-      applyAnchorToTexture: true,
-    });
+    platform.width = width;
+    platform.tileScale.set(scale, scale);
+    platform.height = platform.texture.height * scale;
+    platform.y = height - platform.height;
+
+    return { floorHeight, scale };
   }
 
   // Use the platform's horizontal position as the key position for the scene.

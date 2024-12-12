@@ -131,6 +131,13 @@ export default class SpineBoy {
     else this.playAnimation(animationMap.idle);
   }
 
+  resize(floorHeight: number, scale: number) {
+    const { width, height } = this.app.screen;
+    this.view.x = width / 2;
+    this.view.y = height - floorHeight;
+    this.spine.scale.set(scale * 0.32);
+  }
+
   loop() {
     if (this.isSpawning()) return;
 

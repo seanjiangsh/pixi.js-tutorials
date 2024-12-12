@@ -11,6 +11,7 @@ import spriteAnimateJet from "./scenes/sprite-animate-jet";
 import tutorialFishPond from "./scenes/tutorials-fish-pond";
 import tutorialChooChooTrain from "./scenes/tutorials-choo-choo-train";
 import spineBoy from "./scenes/spineboy/tutorials-spineboy";
+import tilingsprite from "./scenes/tiling-sprite";
 
 const scenes: { [key: string]: () => Promise<() => void> } = {
   "hello-world": helloWorld,
@@ -26,9 +27,13 @@ const scenes: { [key: string]: () => Promise<() => void> } = {
   "tutorial-fish-pond": tutorialFishPond,
   "tutorial-choo-choo-train": tutorialChooChooTrain,
   "tutorial-spineboy": spineBoy,
+  "tiling-sprite": tilingsprite,
 };
 
 let currentSceneCleanup: (() => void) | null = null;
+const sceneListToggle = document.getElementById("scene-list-toggle")!;
+const sceneContainer = document.getElementById("scene-list-container")!;
+const sceneList = document.getElementById("scene-list")!;
 
 async function loadScene(scene: string) {
   if (currentSceneCleanup) {
@@ -41,6 +46,13 @@ async function loadScene(scene: string) {
     currentSceneCleanup = await sceneFunction();
   }
   document.title = `Pixi.js - ${scene}`;
+
+  // * show scene list if it's development
+  if (import.meta.env.DEV) {
+    sceneContainer.style.display = "block";
+  } else {
+    sceneContainer.style.display = "none";
+  }
 }
 
 document.querySelectorAll("#scene-list a").forEach((link) => {
@@ -53,15 +65,10 @@ document.querySelectorAll("#scene-list a").forEach((link) => {
   });
 });
 
-const sceneListToggle = document.getElementById("scene-list-toggle")!;
-const sceneList = document.getElementById("scene-list")!;
-
 sceneListToggle.addEventListener("click", () => {
   sceneList.classList.toggle("open");
 });
 
-// Create li for each scene in 'scene-list-container'
-const sceneContainer = document.getElementById("scene-list")!;
 for (const scene in scenes) {
   const li = document.createElement("li");
   const a = document.createElement("a");
@@ -73,7 +80,7 @@ for (const scene in scenes) {
     if (scene) loadScene(scene);
   });
   li.appendChild(a);
-  sceneContainer.appendChild(li);
+  sceneList.appendChild(li);
 }
 
 // Load default scene

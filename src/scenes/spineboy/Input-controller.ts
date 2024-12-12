@@ -1,3 +1,8 @@
+import JoystickController, {
+  JoystickOptions,
+  JoystickOnMove,
+} from "joystick-controller";
+
 // Map keyboard key codes to controller's state keys
 const keyMap: { [key: string]: string } = {
   Space: "space",
